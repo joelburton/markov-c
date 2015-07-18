@@ -200,21 +200,17 @@ void makeText(GHashTable *chains)
 
 int main(int argc, char *argv[])
 {
+    g_set_application_name("Markov Generator");
+    const gchar *prg_name = g_path_get_basename(argv[0]);
     if (argc != 2) {
-        g_printf("%s: Generate Markov chain\n\n", argv[0]);
-        g_printf("  usage: %s [file]\n", argv[0]);
+        g_printf("%s: Generate Markov chain\n\n", prg_name);
+        g_printf("  usage: %s [file]\n", prg_name);
         return 1;
     }
 
-    GError *gerror;
-    GIOChannel *in_file = g_io_channel_new_file(argv[1], "r", &gerror);
     gchar *in_str;
-    gsize in_length;
-
-    GIOStatus status = g_io_channel_read_to_end(in_file,
-                                                &in_str,
-                                                &in_length,
-                                                &gerror);
+    if (g_file_get_contents(argv[1], &in_str, NULL, NULL) == FALSE)
+        return 1;
 
     GHashTable *chains = makeChains(in_str);
     if (!chains)
