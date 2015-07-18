@@ -1,9 +1,4 @@
-/* Markov
- *
- * Markov chain generator.
- *
- * Written as example for an Intro to C course; teaches data structures
- * and algorithms and use of the GLib library.
+/* Markov Text Generator
  *
  * Raises warnings if not compiled with a C89 or newer compiler.
  * Tested with GCC 5.1.
@@ -24,27 +19,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file
+ *
+ * This file contains the functions to make a hashmap of bigram chains
+ * and to generate text from those chains.
+ *
+ * */
 
 #include <glib.h>
 #include <glib/gprintf.h>
 
 
-#define MAX_LINE_LENGTH 60
+#define MAX_LINE_LENGTH 60  ///< Maximum length of generated text line
 
 
-/* Our generator uses bigrams, 2-word tuples. */
+/** Bigram: a two-word tuple. */
 
 typedef struct _bigram {
-    gchar *first;
-    gchar *second;
+    gchar *first;   ///< first word
+    gchar *second;  ///< second word
 } Bigram;
 
 
 /** Hash a bigram.
  *
+ * @param bigram: bigram to hash.
+ *
  * Creates a hash by hashing both strings and combining with bitwise OR.
  * This is needed for the hashmap, since we'll be storing bigrams as keys
  * in our hashmap.
+ *
+ * @return Hash
  */
 
 guint bigram_hash(gconstpointer bigram)
@@ -56,9 +61,14 @@ guint bigram_hash(gconstpointer bigram)
 
 /** Check two bigrams for equality.
  *
+ * @param bigram1: bigram to compare
+ * @param bigram2: bigram to compare
+ *
  * Bigrams are equal if both words are equal. This is needed since we're
  * storing bigrams in our hashmap, and need to see if a key is equal to
  * another bigram.
+ *
+ * @return TRUE or FALSE
  */
 
 gboolean bigram_equal(gconstpointer bigram1, gconstpointer bigram2)
@@ -72,13 +82,18 @@ gboolean bigram_equal(gconstpointer bigram1, gconstpointer bigram2)
 
 /** Add a word to a bigram chain.
  *
+ * @param chains: chains hashmap
+ * @param first: first word of bigram
+ * @param second: second word of bigram
+ * @param follows: word to add to bigram chain
+ *
  * Find or create the chain of (first, second), and add follows to it.
  */
 
-void add_word_to_chain(const gchar *first,
+void add_word_to_chain(GHashTable *chains,
+                       const gchar *first,
                        const gchar *second,
-                       gchar *follows,
-                       GHashTable *chains)
+                       gchar *follows)
 {
     GPtrArray *follow_words;
 
@@ -97,7 +112,9 @@ void add_word_to_chain(const gchar *first,
 
 /** Create hash table of (word-1, word-2) => [follow-word-1, follow-word-2, ...]
  *
- * Returns pointer to hash table.
+ * @param in_string: C string of input text
+ *
+ * @return pointer to hash table
  */
 
 GHashTable *makeChains(const gchar *in_string)
@@ -127,7 +144,7 @@ GHashTable *makeChains(const gchar *in_string)
         if (g_str_equal(follows, ""))
             continue;
 
-        add_word_to_chain(first, second, follows, chains);
+        add_word_to_chain(chains, first, second, follows);
 
         // Move words down so our next chain is (curr-second, curr-follows)
         first = second;
@@ -136,7 +153,7 @@ GHashTable *makeChains(const gchar *in_string)
 
     // Add the last two words of source with a NULL entry as follows;
     // we'll use this to stop our text generation
-    add_word_to_chain(first, second, NULL, chains);
+    add_word_to_chain(chains, first, second, NULL);
 
     return chains;
 }
@@ -144,6 +161,9 @@ GHashTable *makeChains(const gchar *in_string)
 
 /** Make markov chain from bigram hashtable.
  *
+ * @param chains: hashmap of bigram chains
+ *
+ * Prints generated text, breaking at MAX_LINE_LENGTH.
  */
 
 void makeText(GHashTable *chains)
@@ -193,9 +213,11 @@ void makeText(GHashTable *chains)
 }
 
 
-/* Handle command-line
+/** Handle command-line
  *
  * Called with one parameter, the file to read text from.
+ *
+ * @return 0 for success, 1 for error
  */
 
 int main(int argc, char *argv[])

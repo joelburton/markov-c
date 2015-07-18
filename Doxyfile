@@ -1,0 +1,65 @@
+# Project related configuration options
+
+PROJECT_NAME           = "Markov"
+PROJECT_NUMBER         =
+PROJECT_BRIEF          = "Markov text generator in C"
+OUTPUT_DIRECTORY       = doc
+OPTIMIZE_OUTPUT_FOR_C  = YES
+
+# If the JAVADOC_AUTOBRIEF tag is set to YES then doxygen will interpret the
+# first line (until the first dot) of a Javadoc-style comment as the brief
+# description. If set to NO, the Javadoc-style will behave just like regular Qt-
+# style comments (thus requiring an explicit @brief command for a brief
+# description.)
+# The default value is: NO.
+
+JAVADOC_AUTOBRIEF      = YES
+
+# When the INLINE_SIMPLE_STRUCTS tag is set to YES, structs, classes, and unions
+# with only public data fields or simple typedef fields will be shown inline in
+# the documentation of the scope in which they are defined (i.e. file,
+# namespace, or group documentation), provided this scope is documented. If set
+# to NO, structs, classes, and unions are shown on a separate page (for HTML and
+# Man pages) or section (for LaTeX and RTF).
+# The default value is: NO.
+
+INLINE_SIMPLE_STRUCTS  = YES
+
+# When TYPEDEF_HIDES_STRUCT tag is enabled, a typedef of a struct, union, or
+# enum is documented as struct, union, or enum with the name of the typedef. So
+# typedef struct TypeS {} TypeT, will appear in the documentation as a struct
+# with name TypeT. When disabled the typedef will appear as a member of a file,
+# namespace, or class. And the struct will be named TypeS. This can typically be
+# useful for C code in case the coding convention dictates that all compound
+# types are typedef'ed and only the typedef is referenced, never the tag name.
+# The default value is: NO.
+
+TYPEDEF_HIDES_STRUCT   = YES
+
+# Build related configuration options
+
+EXTRACT_ALL            = YES
+SHOW_USED_FILES        = NO
+
+# Configuration options related to the input files
+
+INPUT                  = markov.c README.md
+USE_MDFILE_AS_MAINPAGE = README.md
+
+# Configuration options related to source browsing
+
+SOURCE_BROWSER         = NO
+INLINE_SOURCES         = NO
+
+# Configuration options related to the alphabetical class index
+
+ALPHABETICAL_INDEX     = NO
+
+# Configuration options related to the HTML output
+
+HTML_TIMESTAMP         = NO
+SEARCHENGINE           = NO
+
+# Configuration options related to the LaTeX output
+
+GENERATE_LATEX         = NO
