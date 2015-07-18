@@ -151,11 +151,15 @@ GHashTable *make_chains(const gchar *in_string)
     }
 
     // We need at least two words of input text
-    if (!first)
-        g_error("ERROR: text too short; it needs at least 2 words");
+    if (!first) {
+        g_printf("ERROR: text too short; it needs at least 2 words\n");
+        return NULL;
+    }
 
-    if (!found_upper)
-        g_error("ERROR: no uppercase words found");
+    if (!found_upper) {
+        g_printf("ERROR: no uppercase words found\n");
+        return NULL;
+    }
 
     // Add the last two words of source with a NULL entry as follows;
     // we'll use this to stop our text generation
@@ -237,10 +241,17 @@ int main(int argc, char *argv[])
     }
 
     gchar *in_str;
-    if (!g_file_get_contents(argv[1], &in_str, NULL, NULL))
-        g_error("Cannot read file");
+    GError *gerror;
+    if (!g_file_get_contents(argv[1], &in_str, NULL, &gerror)) {
+        g_printf("Error: Cannot read file: %s\n", gerror->message);
+        return 1;
+    }
 
     GHashTable *chains = make_chains(in_str);
+
+    if (!chains)
+        return 1;
+
     make_text(chains);
 
     return 0;
