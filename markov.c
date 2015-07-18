@@ -117,7 +117,7 @@ void add_word_to_chain(GHashTable *chains,
  * @return pointer to hash table
  */
 
-GHashTable *makeChains(const gchar *in_string)
+GHashTable *make_chains(const gchar *in_string)
 {
     gchar *first = NULL;
     gchar *second = NULL;
@@ -128,28 +128,34 @@ GHashTable *makeChains(const gchar *in_string)
     // Split input string on whitespace into words list
     gchar **words = g_strsplit_set(in_string, " \n", -1);
 
-    // We need at least two words of input text
-    if (!words[0] || !words[1]) {
-        g_printf("ERROR: too short!\n");
-        return NULL;
-    }
+    // Make sure at least one word is uppercase (or we hang forever when
+    // generating text, as it looks to start with an uppercase letter
+    gboolean found_upper = FALSE;
 
-    first = words[0];
-    second = words[1];
-
-    for (int i = 2; words[i]; i++) {
+    for (int i = 0; words[i]; i++) {
         follows = words[i];
 
         // Skip empty words (which we get with double-whitespace in input)
         if (g_str_equal(follows, ""))
             continue;
 
-        add_word_to_chain(chains, first, second, follows);
+        if (g_ascii_isupper(follows[0]))
+            found_upper = TRUE;
+
+        if (first && second)
+            add_word_to_chain(chains, first, second, follows);
 
         // Move words down so our next chain is (curr-second, curr-follows)
         first = second;
         second = follows;
     }
+
+    // We need at least two words of input text
+    if (!first)
+        g_error("ERROR: text too short; it needs at least 2 words");
+
+    if (!found_upper)
+        g_error("ERROR: no uppercase words found");
 
     // Add the last two words of source with a NULL entry as follows;
     // we'll use this to stop our text generation
@@ -166,7 +172,7 @@ GHashTable *makeChains(const gchar *in_string)
  * Prints generated text, breaking at MAX_LINE_LENGTH.
  */
 
-void makeText(GHashTable *chains)
+void make_text(GHashTable *chains)
 {
     Bigram *bigram;
     guint line_length = 0;
@@ -231,13 +237,11 @@ int main(int argc, char *argv[])
     }
 
     gchar *in_str;
-    if (g_file_get_contents(argv[1], &in_str, NULL, NULL) == FALSE)
-        return 1;
+    if (!g_file_get_contents(argv[1], &in_str, NULL, NULL))
+        g_error("Cannot read file");
 
-    GHashTable *chains = makeChains(in_str);
-    if (!chains)
-        return 1;
+    GHashTable *chains = make_chains(in_str);
+    make_text(chains);
 
-    makeText(chains);
     return 0;
 }
