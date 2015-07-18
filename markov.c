@@ -142,8 +142,11 @@ GHashTable *make_chains(const gchar *in_string)
         if (g_ascii_isupper(follows[0]))
             found_upper = TRUE;
 
-        if (first && second)
+
+        if (first && second) {
             add_word_to_chain(chains, first, second, follows);
+            g_debug("%s %s => %s", first, second, follows);
+        }
 
         // Move words down so our next chain is (curr-second, curr-follows)
         first = second;
@@ -189,6 +192,7 @@ void make_text(GHashTable *chains)
         bigram = keys[g_random_int_range(0, n_chains)];
         if (g_ascii_isupper(*(bigram->first)))
             break;
+        g_debug("rejected as lowercase: %s", bigram->first);
     }
 
     line_length += g_printf("%s %s ", bigram->first, bigram->second);
