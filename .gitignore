@@ -1,2 +1,4 @@
 /doc/
 /markov
+/cmake-build-debug
+/.idea

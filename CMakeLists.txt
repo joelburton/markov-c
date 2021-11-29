@@ -1,11 +1,8 @@
 cmake_minimum_required(VERSION 3.2)
 project(markov)
 
-include(FindPkgConfig)
-pkg_search_module(GLIB2 REQUIRED glib-2.0)
-include_directories(${GLIB2_INCLUDE_DIRS})
-link_libraries(${GLIB2_LIBRARIES})
+add_executable(markov markov.c)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c11")
-
-add_executable(markov ${SOURCE_FILES} markov.c)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0)
+target_link_libraries(markov PkgConfig::deps)
